@@ -71,7 +71,9 @@ public:
     void terminate(FEngine& engine);
 
     void prepare(utils::JobSystem& js, LinearAllocatorArena& allocator,
-            math::mat4 const& worldOriginTransform, bool shadowReceiversAreCasters) noexcept;
+            math::mat4 const& worldTransform,
+            math::double3 const& worldOrigin,
+            bool shadowReceiversAreCasters) noexcept;
 
     void prepareVisibleRenderables(utils::Range<uint32_t> visibleRenderables) noexcept;
 
@@ -162,6 +164,8 @@ public:
     enum {
         POSITION_RADIUS,
         DIRECTION,
+        SHADOW_DIRECTION,
+        SHADOW_REF,
         LIGHT_INSTANCE,
         VISIBILITY,
         SCREEN_SPACE_Z_RANGE,
@@ -171,6 +175,8 @@ public:
     using LightSoa = utils::StructureOfArrays<
             math::float4,
             math::float3,
+            math::float3,
+            math::double2,
             FLightManager::Instance,
             Culler::result_type,
             math::float2,

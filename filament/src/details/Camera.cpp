@@ -266,8 +266,11 @@ CameraInfo::CameraInfo(FCamera const& camera) noexcept {
     d                  = std::max(zn, camera.getFocusDistance());
 }
 
-CameraInfo::CameraInfo(FCamera const& camera, const math::mat4& worldOriginCamera) noexcept {
-    const mat4 modelMatrix{ worldOriginCamera * camera.getModelMatrix() };
+CameraInfo::CameraInfo(FCamera const& camera,
+        math::mat3f const& inWorldRotation,
+        math::double3 const& inWorldTranslation) noexcept {
+    mat4 const inWorldTransform = mat4{ inWorldRotation } * mat4::translation(inWorldTranslation);
+    const mat4 modelMatrix{ inWorldTransform * camera.getModelMatrix() };
     for (uint8_t i = 0; i < CONFIG_STEREOSCOPIC_EYES; i++) {
         eyeProjection[i]   = mat4f{ camera.getProjectionMatrix(i) };
         eyeFromView[i]     = mat4f{ camera.getEyeFromViewMatrix(i) };
@@ -275,7 +278,8 @@ CameraInfo::CameraInfo(FCamera const& camera, const math::mat4& worldOriginCamer
     cullingProjection  = mat4f{ camera.getCullingProjectionMatrix() };
     model              = mat4f{ modelMatrix };
     view               = mat4f{ inverse(modelMatrix) };
-    worldOrigin        = worldOriginCamera;
+    worldTransform     = inWorldTransform;
+    worldTranslation   = inWorldTranslation;
     zn                 = (float)camera.getNear();
     zf                 = (float)camera.getCullingFar();
     ev100              = Exposure::ev100(camera);
