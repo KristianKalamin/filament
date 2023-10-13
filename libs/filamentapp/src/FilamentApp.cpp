@@ -73,20 +73,24 @@ public:
         if (gpuHint.empty()) {
             return;
         }
+        VulkanPlatform::Customization::GPUPreference pref;
         // Check to see if it is an integer, if so turn it into an index.
         if (std::all_of(gpuHint.begin(), gpuHint.end(), ::isdigit)) {
-            mPreference.index = static_cast<int8_t>(std::stoi(gpuHint));
-            return;
+            pref.index = static_cast<int8_t>(std::stoi(gpuHint));
+        } else {
+            pref.deviceName = gpuHint;
         }
-        mPreference.deviceName = gpuHint;
+        mCustomization = {
+            .gpu = pref
+        };
     }
 
-    virtual VulkanPlatform::GPUPreference getPreferredGPU() noexcept override {
-        return mPreference;
+    virtual VulkanPlatform::Customization getCustomization() const noexcept override {
+        return mCustomization;
     }
 
 private:
-    VulkanPlatform::GPUPreference mPreference;
+    VulkanPlatform::Customization mCustomization;
 };
 #endif
 
